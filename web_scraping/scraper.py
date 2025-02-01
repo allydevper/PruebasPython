@@ -29,7 +29,11 @@ def obtener_contenido_horoscopo(url):
         for signo in signos_horoscopos:
             siguiente_parrafo = signo.find_next('p', class_='story-contents__font-paragraph')
             if siguiente_parrafo:
-                predicciones_horoscopo.append(siguiente_parrafo.get_text())
+                texto = siguiente_parrafo.get_text()
+                print(texto)
+                partes = texto.split(":")
+                for parte in partes:
+                    predicciones_horoscopo.append(parte.strip())
 
         return signos_horoscopo, predicciones_horoscopo
 
