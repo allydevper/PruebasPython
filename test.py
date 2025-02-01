@@ -9,13 +9,24 @@ grupo_actual = []
 
 for x, item in enumerate(original):
     item_limpio = item.strip()
-    print(item_limpio)
     if not item_limpio:
         continue
     if ':' in item_limpio:
         grupo_actual.append(item_limpio)
     else:
-       print(x)
        grupo_actual[-1] += " " + item_limpio
 
-print(grupo_actual)
+tipos = []
+contenidos = []
+
+for linea in grupo_actual:
+    if ':' in linea:
+
+        tipo = linea.split(':')[0].strip()
+        contenido = linea.split(':')[1].strip()
+
+        tipos.append(tipo[:1].upper() + tipo[1:])
+        contenidos.append(contenido[:1].upper() + contenido[1:])
+
+print(tipos)
+print(contenidos)

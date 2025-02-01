@@ -1,4 +1,5 @@
 import requests
+import re
 import csv
 from bs4 import BeautifulSoup
 
@@ -30,13 +31,40 @@ def obtener_contenido_horoscopo(url):
         for signo in signos_horoscopos:
             siguiente_parrafo = signo.find_next('p', class_='story-contents__font-paragraph')
             if siguiente_parrafo:
-                texto = siguiente_parrafo.get_text()
-                predicciones_horoscopo.append(texto)
+                predicciones_horoscopo = obtener_eventos_horoscopo(siguiente_parrafo.get_text())
 
         return signos_horoscopo, predicciones_horoscopo
 
     else:
         return f"Error al acceder a la página: {respuesta.status_code}"
+
+def obtener_eventos_horoscopo(linea):
+
+    original = re.split(r"\.", linea)
+
+    grupo_actual = []
+
+    for x, item in enumerate(original):
+        item_limpio = item.strip()
+        if not item_limpio:
+            continue
+        if ':' in item_limpio:
+            grupo_actual.append(item_limpio)
+        else:
+            grupo_actual[-1] += " " + item_limpio
+
+    tipos = []
+    contenidos = []
+
+    for linea in grupo_actual:
+        if ':' in linea:
+
+            tipo = linea.split(':')[0].strip()
+            contenido = linea.split(':')[1].strip()
+
+            tipos.append(tipo[:1].upper() + tipo[1:])
+            contenidos.append(contenido[:1].upper() + contenido[1:])
+    return tipos, contenidos
 
 url = 'https://elcomercio.pe/noticias/horoscopo/'
 enlaces = realizar_scraping(url)
