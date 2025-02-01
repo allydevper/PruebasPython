@@ -27,7 +27,8 @@ def obtener_contenido_horoscopo(url):
         for signo in signos_horoscopos:
             siguiente_parrafo = signo.find_next('p', class_='story-contents__font-paragraph')
             if siguiente_parrafo:
-                predicciones_horoscopo.append(obtener_eventos_horoscopo(siguiente_parrafo.get_text()))
+                tipos, contenidos = obtener_eventos_horoscopo(siguiente_parrafo.get_text())
+                predicciones_horoscopo.append((tipos, contenidos))
 
         return signos_horoscopo, predicciones_horoscopo
 
@@ -63,9 +64,10 @@ enlaces = realizar_scraping(url)
 
 with open('horoscopo.csv', mode='w', newline='', encoding='utf-8') as archivo_csv:
     escritor_csv = csv.writer(archivo_csv)
-    escritor_csv.writerow(['Signo', 'Predicciones'])  # Escribir encabezados
+    escritor_csv.writerow(['Signo', 'Tipos', 'Contenidos'])  # Escribir encabezados
 
     for enlace in enlaces[:1]:
         signos, predicciones = obtener_contenido_horoscopo("https://elcomercio.pe" + enlace)
-        for signo, prediccion in zip(signos, predicciones):
-            escritor_csv.writerow([signo, prediccion])  # Escribir datos en el CSV
+        for signo, (tipos, contenidos) in zip(signos, predicciones):
+            for tipo, contenido in zip(tipos, contenidos):
+                escritor_csv.writerow([signo, tipo, contenido])  # Escribir datos en el CSV
