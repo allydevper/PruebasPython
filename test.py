@@ -5,24 +5,17 @@ text = "Amor: alejará a gente entrometida para proteger a la pareja. La relaci�
 
 original = re.split(r"\.", text)
 
-grupos = []
 grupo_actual = []
 
 for x, item in enumerate(original):
     item_limpio = item.strip()
     print(item_limpio)
     if not item_limpio:
-        continue  # Ignorar strings vacíos
+        continue
     if ':' in item_limpio:
-        # if grupo_actual is not None:
-        #     grupos.append(grupo_actual)
         grupo_actual.append(item_limpio)
     else:
        print(x)
-       grupo_actual[x-1].append(item_limpio)
-
-# Añadir el último grupo si existe
-# if grupo_actual is not None:
-#     grupos.append(grupo_actual)
+       grupo_actual[-1] += " " + item_limpio
 
 print(grupo_actual)

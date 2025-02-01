@@ -1,4 +1,5 @@
 import requests
+import csv
 from bs4 import BeautifulSoup
 
 def realizar_scraping(url):
@@ -30,10 +31,7 @@ def obtener_contenido_horoscopo(url):
             siguiente_parrafo = signo.find_next('p', class_='story-contents__font-paragraph')
             if siguiente_parrafo:
                 texto = siguiente_parrafo.get_text()
-                print(texto)
-                partes = texto.split(":")
-                for parte in partes:
-                    predicciones_horoscopo.append(parte.strip())
+                predicciones_horoscopo.append(texto)
 
         return signos_horoscopo, predicciones_horoscopo
 
@@ -43,7 +41,11 @@ def obtener_contenido_horoscopo(url):
 url = 'https://elcomercio.pe/noticias/horoscopo/'
 enlaces = realizar_scraping(url)
 
-for enlace in enlaces[:1]:
-    signos, predicciones = obtener_contenido_horoscopo("https://elcomercio.pe" + enlace)
-    print(f"Signos: {signos}")
-    print(f"Predicciones: {predicciones}") 
+with open('horoscopo.csv', mode='w', newline='', encoding='utf-8') as archivo_csv:
+    escritor_csv = csv.writer(archivo_csv)
+    escritor_csv.writerow(['Signo', 'Predicciones'])  # Escribir encabezados
+
+    for enlace in enlaces[:1]:
+        signos, predicciones = obtener_contenido_horoscopo("https://elcomercio.pe" + enlace)
+        for signo, prediccion in zip(signos, predicciones):
+            escritor_csv.writerow([signo, prediccion])  # Escribir datos en el CSV
