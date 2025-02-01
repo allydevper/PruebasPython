@@ -22,9 +22,12 @@ def obtener_contenido_horoscopo(url):
     if respuesta.status_code == 200:
         soup = BeautifulSoup(respuesta.content, 'html.parser')
 
-        titulo_horoscopos = soup.find_all('h2', class_='story-contents__header')
-        titulo_horoscopo = [titulo_horoscopo.get_text() for titulo_horoscopo in titulo_horoscopos]
-        return titulo_horoscopo
+        signos_horoscopos = soup.find_all('h2', class_='story-contents__header')
+        signos_horoscopo = [signos_horoscopo.get_text().split(" ")[0] for signos_horoscopo in signos_horoscopos]
+
+        predicciones_horoscopos = soup.find_all('p', class_='story-contents__font-paragraph')
+        predicciones_horoscopo = [predicciones_horoscopo.get_text() for predicciones_horoscopo in predicciones_horoscopos]
+        return signos_horoscopo, predicciones_horoscopo
 
     else:
         return f"Error al acceder a la página: {respuesta.status_code}"
@@ -33,5 +36,6 @@ url = 'https://elcomercio.pe/noticias/horoscopo/'
 enlaces = realizar_scraping(url)
 
 for enlace in enlaces[:1]:
-    contenido = obtener_contenido_horoscopo("https://elcomercio.pe" + enlace)
-    print(f"El contenido del horóscopo es: {contenido}") 
+    signos, predicciones = obtener_contenido_horoscopo("https://elcomercio.pe" + enlace)
+    print(f"Signos: {signos}")
+    print(f"Predicciones: {predicciones}") 
