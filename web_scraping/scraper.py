@@ -25,8 +25,12 @@ def obtener_contenido_horoscopo(url):
         signos_horoscopos = soup.find_all('h2', class_='story-contents__header')
         signos_horoscopo = [signos_horoscopo.get_text().split(" ")[0] for signos_horoscopo in signos_horoscopos]
 
-        predicciones_horoscopos = soup.find_all('p', class_='story-contents__font-paragraph')
-        predicciones_horoscopo = [predicciones_horoscopo.get_text() for predicciones_horoscopo in predicciones_horoscopos]
+        predicciones_horoscopo = []
+        for signo in signos_horoscopos:
+            siguiente_parrafo = signo.find_next('p', class_='story-contents__font-paragraph')
+            if siguiente_parrafo:
+                predicciones_horoscopo.append(siguiente_parrafo.get_text())
+
         return signos_horoscopo, predicciones_horoscopo
 
     else:
