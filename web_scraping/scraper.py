@@ -64,7 +64,7 @@ enlaces = realizar_scraping(url)
 
 with open('horoscopo.csv', mode='w', newline='', encoding='utf-8') as archivo_csv:
     escritor_csv = csv.writer(archivo_csv)
-    escritor_csv.writerow(['Signo', 'Tipos', 'Contenidos'])  # Escribir encabezados
+    escritor_csv.writerow(['Signo', 'Categoria', 'Contenido'])  # Escribir encabezados
 
     for enlace in enlaces[:1]:
         signos, predicciones = obtener_contenido_horoscopo("https://elcomercio.pe" + enlace)
