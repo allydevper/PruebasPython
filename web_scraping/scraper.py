@@ -11,13 +11,9 @@ def realizar_scraping(url):
         enlaces_horoscopo = soup.find_all('a', class_='story-item__title', href=True)
         enlaces_filtrados = [enlace['href'] for enlace in enlaces_horoscopo if "horoscopo-de-hoy" in enlace['href'] and "vivo" not in enlace['href']]
         
-        if enlaces_filtrados:
-            return enlaces_filtrados
-        else:
-            return "No se encontraron enlaces del horóscopo."
+        return enlaces_filtrados if enlaces_filtrados else "No se encontraron enlaces del horóscopo."
 
-    else:
-        return f"Error al acceder a la página: {respuesta.status_code}"
+    return f"Error al acceder a la página: {respuesta.status_code}"
 
 def obtener_contenido_horoscopo(url):
     respuesta = requests.get(url)
@@ -31,20 +27,18 @@ def obtener_contenido_horoscopo(url):
         for signo in signos_horoscopos:
             siguiente_parrafo = signo.find_next('p', class_='story-contents__font-paragraph')
             if siguiente_parrafo:
-                predicciones_horoscopo = obtener_eventos_horoscopo(siguiente_parrafo.get_text())
+                predicciones_horoscopo.append(obtener_eventos_horoscopo(siguiente_parrafo.get_text()))
 
         return signos_horoscopo, predicciones_horoscopo
 
-    else:
-        return f"Error al acceder a la página: {respuesta.status_code}"
+    return f"Error al acceder a la página: {respuesta.status_code}"
 
 def obtener_eventos_horoscopo(linea):
-
     original = re.split(r"\.", linea)
 
     grupo_actual = []
 
-    for x, item in enumerate(original):
+    for item in original:
         item_limpio = item.strip()
         if not item_limpio:
             continue
@@ -58,12 +52,10 @@ def obtener_eventos_horoscopo(linea):
 
     for linea in grupo_actual:
         if ':' in linea:
-
-            tipo = linea.split(':')[0].strip()
-            contenido = linea.split(':')[1].strip()
-
-            tipos.append(tipo[:1].upper() + tipo[1:])
-            contenidos.append(contenido[:1].upper() + contenido[1:])
+            tipo, contenido = map(str.strip, linea.split(':', 1))
+            tipos.append(tipo.capitalize())
+            contenidos.append(contenido.capitalize())
+    
     return tipos, contenidos
 
 url = 'https://elcomercio.pe/noticias/horoscopo/'
