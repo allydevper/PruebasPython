@@ -399,3 +399,5 @@ FodyWeavers.xsd
 web_scraping/horoscopo.csv
 ml_horoscopo/
 web_scraping/horoscopo_base.csv
+web_scraping/formatted.csv
+web_scraping/test.csv

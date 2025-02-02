@@ -1,13 +1,20 @@
 import pandas as pd
+import re
 
 # Cargar el dataset
-datos = pd.read_csv('web_scraping/horoscopo_base.csv')
+datos = pd.read_csv('web_scraping/test.csv')
 
 # Verificar que no haya valores nulos
 print(datos.isnull().sum())
 
-# Convertir el texto a minúsculas (opcional)
-datos['Contenido'] = datos['Contenido'].str.lower()
+def limpiar_texto(texto):
+    # Eliminar caracteres especiales y números
+    texto = re.sub(r'[^a-zA-ZáéíóúñÁÉÍÓÚÑ\s]', '', texto)
+    # Convertir a minúsculas
+    texto = texto.lower()
+    return texto
+
+datos['Contenido'] = datos['Contenido'].apply(limpiar_texto)
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
