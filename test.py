@@ -1,7 +1,7 @@
 import pandas as pd
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
 from nltk.corpus import stopwords
@@ -34,7 +34,13 @@ X_texto = vectorizer.fit_transform(datos['Contenido'])
 
 # Incorporar la columna "Categoria" como característica adicional
 categorias_dummy = pd.get_dummies(datos['Categoria'], prefix='Categoria')
-X = pd.concat([pd.DataFrame(X_texto.toarray()), categorias_dummy.reset_index(drop=True)], axis=1)
+X_texto_df = pd.DataFrame(X_texto.toarray())  # Convertir la matriz sparse a DataFrame
+X_texto_df.columns = [str(i) for i in range(X_texto_df.shape[1])]  # Asegurar que los nombres de columnas sean cadenas
+
+X = pd.concat([X_texto_df, categorias_dummy.reset_index(drop=True)], axis=1)
+
+# Asegurar que todas las columnas tengan nombres como cadenas
+X.columns = X.columns.astype(str)
 
 y = datos['Signo']
 
