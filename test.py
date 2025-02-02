@@ -1,32 +1,34 @@
-import re
+import pandas as pd
 
-# Define a string
-text = "Amor: alejará a gente entrometida para proteger a la pareja. La relación comenzará a estar sólida. Salud: un estudio resultará bien. Sorpresa: críticas interesadas."
+# Cargar el dataset
+datos = pd.read_csv('web_scraping/horoscopo_base.csv')
 
-original = re.split(r"\.", text)
+# Verificar que no haya valores nulos
+print(datos.isnull().sum())
 
-grupo_actual = []
+# Convertir el texto a minúsculas (opcional)
+datos['Contenido'] = datos['Contenido'].str.lower()
 
-for x, item in enumerate(original):
-    item_limpio = item.strip()
-    if not item_limpio:
-        continue
-    if ':' in item_limpio:
-        grupo_actual.append(item_limpio)
-    else:
-       grupo_actual[-1] += " " + item_limpio
+from sklearn.feature_extraction.text import TfidfVectorizer
 
-tipos = []
-contenidos = []
+# Vectorizar el texto usando TF-IDF
+vectorizer = TfidfVectorizer(max_features=1000)  # Limitar a 1000 palabras más frecuentes
+X = vectorizer.fit_transform(datos['Contenido'])
+y = datos['Signo']  # Etiquetas (signos del zodiaco)
 
-for linea in grupo_actual:
-    if ':' in linea:
+from sklearn.model_selection import train_test_split
 
-        tipo = linea.split(':')[0].strip()
-        contenido = linea.split(':')[1].strip()
+# Dividir los datos: 80% entrenamiento, 20% prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        tipos.append(tipo[:1].upper() + tipo[1:])
-        contenidos.append(contenido[:1].upper() + contenido[1:])
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score, classification_report
 
-print(tipos)
-print(contenidos)
+# Entrenar el modelo
+modelo = MultinomialNB()
+modelo.fit(X_train, y_train)
+
+# Evaluar el modelo
+y_pred = modelo.predict(X_test)
+print(f'Precisión: {accuracy_score(y_test, y_pred)}')
+print(classification_report(y_test, y_pred))

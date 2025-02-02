@@ -397,3 +397,5 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 web_scraping/horoscopo.csv
+ml_horoscopo/
+web_scraping/horoscopo_base.csv

@@ -59,14 +59,14 @@ def obtener_eventos_horoscopo(linea):
     
     return tipos, contenidos
 
-url = 'https://elcomercio.pe/noticias/horoscopo/'
+url = 'https://elcomercio.pe/noticias/horoscopo/6/'
 enlaces = realizar_scraping(url)
 
 with open('horoscopo.csv', mode='w', newline='', encoding='utf-8') as archivo_csv:
     escritor_csv = csv.writer(archivo_csv)
     escritor_csv.writerow(['Signo', 'Categoria', 'Contenido'])  # Escribir encabezados
 
-    for enlace in enlaces[:1]:
+    for enlace in enlaces:
         signos, predicciones = obtener_contenido_horoscopo("https://elcomercio.pe" + enlace)
         for signo, (tipos, contenidos) in zip(signos, predicciones):
             for tipo, contenido in zip(tipos, contenidos):
