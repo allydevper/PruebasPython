@@ -1,13 +1,14 @@
 import pandas as pd
 import re
-from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
+from gensim.models import Word2Vec
 from imblearn.over_sampling import SMOTE
 import nltk
+import numpy as np
 
 # Descargar recursos de NLTK
 nltk.download('stopwords')
@@ -28,20 +29,21 @@ def limpiar_texto(texto):
 
 datos['Contenido'] = datos['Contenido'].apply(limpiar_texto)
 
-# Representación de texto con TF-IDF
-vectorizer = TfidfVectorizer(max_features=2000)  # Aumentar características a 2000
-X_texto = vectorizer.fit_transform(datos['Contenido'])
+# Entrenar un modelo Word2Vec con Gensim
+oraciones = [texto.split() for texto in datos['Contenido']]
+modelo_word2vec = Word2Vec(sentences=oraciones, vector_size=300, window=5, min_count=1, workers=4)
 
-# Incorporar la columna "Categoria" como característica adicional
-categorias_dummy = pd.get_dummies(datos['Categoria'], prefix='Categoria')
-X_texto_df = pd.DataFrame(X_texto.toarray())  # Convertir la matriz sparse a DataFrame
-X_texto_df.columns = [str(i) for i in range(X_texto_df.shape[1])]  # Asegurar que los nombres de columnas sean cadenas
+# Generar embeddings usando Word2Vec
+def generar_embedding(texto):
+    palabras = texto.split()
+    if len(palabras) == 0:  # Manejar el caso de textos vacíos
+        return np.zeros(300)
+    vector = np.mean([modelo_word2vec.wv[palabra] for palabra in palabras if palabra in modelo_word2vec.wv] or [np.zeros(300)], axis=0)
+    return vector
 
-X = pd.concat([X_texto_df, categorias_dummy.reset_index(drop=True)], axis=1)
-
-# Asegurar que todas las columnas tengan nombres como cadenas
-X.columns = X.columns.astype(str)
-
+# Generar los embeddings para cada texto
+embeddings = datos['Contenido'].apply(generar_embedding)
+X = pd.DataFrame(embeddings.tolist())  # Convertir a DataFrame para manipular
 y = datos['Signo']
 
 # Balancear clases con SMOTE
